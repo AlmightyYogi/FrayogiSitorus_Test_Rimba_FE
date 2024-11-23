@@ -38,7 +38,7 @@ export const getProducts = async () => {
     const response = await api.get('/products');
     console.log("Products API Response:", response.data);
     return response.data;
-  };
+};
 
 export const createProduct = async (productData) => {
     const response = await api.post('/products', productData);
@@ -49,7 +49,7 @@ export const getTransactions = async () => {
     const response = await api.get('/transactions');
     console.log("Transactions API Response:", response.data);
     return response.data;
-  };
+};
 
 export const createTransaction = async (userId, productIds, totalAmount) => {
     const response = await api.post('/transactions', { userId, productIds, totalAmount });
