@@ -7,15 +7,12 @@ const Product = () => {
   const [newProduct, setNewProduct] = useState({ name: '', description: '', price: '' });
   const [isFormDisabled, setIsFormDisabled] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [showSuccessModal, setShowSuccessModal] = useState(false); // Success modal state
+  const [showSuccessModal, setShowSuccessModal] = useState(false); 
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
       setIsFormDisabled(true);
-    } else {
-      const decodedToken = JSON.parse(atob(token.split('.')[1]));
-      const userId = decodedToken.id;
     }
 
     const fetchProducts = async () => {
@@ -37,12 +34,12 @@ const Product = () => {
     const data = await getProducts();
     setProducts(data.products);
     setShowModal(false);
-    setShowSuccessModal(true); // Show success modal after adding product
+    setShowSuccessModal(true);
   };
 
   const handleShowModal = () => setShowModal(true);
   const handleCloseModal = () => setShowModal(false);
-  const handleCloseSuccessModal = () => setShowSuccessModal(false); // Close success modal
+  const handleCloseSuccessModal = () => setShowSuccessModal(false);
 
   return (
     <Container>
@@ -88,7 +85,6 @@ const Product = () => {
         </Modal.Footer>
       </Modal>
 
-      {/* Add New Product Modal */}
       <Modal show={showModal} onHide={handleCloseModal}>
         <Modal.Header closeButton>
           <Modal.Title>Add New Product</Modal.Title>

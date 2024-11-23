@@ -2,22 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Button, Form, Container, Row, Col, Card, Alert, Modal } from 'react-bootstrap';
 import { createTransaction, getProducts } from '../services/api';
 
-const getUserIdFromToken = () => {
-  const token = localStorage.getItem('token');
-  console.log("Token from localStorage:", token);
-
-  if (token) {
-    try {
-      const decoded = JSON.parse(atob(token.split('.')[1]));
-      console.log("Decoded token:", decoded);
-      return decoded.id;
-    } catch (error) {
-      console.error('Invalid token format', error);
-    }
-  }
-  return null;
-};
-
 const Transaction = () => {
   const [transactionData, setTransactionData] = useState({
     userId: '',
@@ -34,8 +18,6 @@ const Transaction = () => {
 
   useEffect(() => {
     const userId = getUserIdFromToken();
-    console.log("User ID from token:", userId);
-
     if (!userId) {
       setIsFormDisabled(true);
     } else {
