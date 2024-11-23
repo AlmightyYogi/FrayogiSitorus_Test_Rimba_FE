@@ -109,6 +109,7 @@ const Product = () => {
                 onChange={handleChange} 
                 disabled={isFormDisabled}
                 placeholder="Enter product name"
+                required
               />
             </Form.Group>
             <Form.Group controlId="description" className="mb-3">
@@ -120,6 +121,7 @@ const Product = () => {
                 onChange={handleChange} 
                 disabled={isFormDisabled}
                 placeholder="Enter product description"
+                required
               />
             </Form.Group>
             <Form.Group controlId="price" className="mb-3">
@@ -131,6 +133,7 @@ const Product = () => {
                 onChange={handleChange} 
                 disabled={isFormDisabled}
                 placeholder="Enter product price"
+                required
               />
             </Form.Group>
             <Button variant="primary" type="submit" disabled={isFormDisabled} className="w-100">
