@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Form, Container, Row, Col, Card, Alert, Modal } from 'react-bootstrap';
+import { Button, Form, Container, Alert, Modal } from 'react-bootstrap';
 import { createTransaction, getProducts } from '../services/api';
 
 const getUserIdFromToken = () => {
