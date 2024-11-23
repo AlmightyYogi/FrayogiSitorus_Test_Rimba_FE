@@ -58,6 +58,9 @@ const Login = () => {
           </Form.Group>
           <Button variant="primary" type="submit" className="w-100">Login</Button>
         </Form>
+        <div className="text-center mt-3">
+          <p>Don't have an account yet? <Link to="/register">Register now</Link></p>
+        </div>
       </Card>
     </Container>
   );
