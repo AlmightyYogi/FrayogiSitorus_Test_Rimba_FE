@@ -4,15 +4,12 @@ import { createTransaction, getProducts } from '../services/api';
 
 const getUserIdFromToken = () => {
   const token = localStorage.getItem('token');
-  console.log("Token from localStorage:", token);
-
   if (token) {
     try {
       const decoded = JSON.parse(atob(token.split('.')[1]));
-      console.log("Decoded token:", decoded);
       return decoded.id;
     } catch (error) {
-      console.error('Invalid token format', error);
+      console.error('Invalid token format:', error);
     }
   }
   return null;
@@ -21,7 +18,7 @@ const getUserIdFromToken = () => {
 const Transaction = () => {
   const [transactionData, setTransactionData] = useState({
     userId: '',
-    productId: '',
+    productIds: [],
     quantity: 1,
     totalAmount: 0,
   });
@@ -34,17 +31,13 @@ const Transaction = () => {
 
   useEffect(() => {
     const userId = getUserIdFromToken();
-    console.log("User ID from token:", userId);
-
     if (!userId) {
+      setError('Invalid user session. Please log in again.');
       setIsFormDisabled(true);
-    } else {
-      setTransactionData((prevData) => ({
-        ...prevData,
-        userId: userId,
-      }));
-      setIsFormDisabled(false);
+      return;
     }
+    setTransactionData((prevData) => ({ ...prevData, userId }));
+    setIsFormDisabled(false);
 
     const fetchProducts = async () => {
       try {
@@ -56,15 +49,12 @@ const Transaction = () => {
 
         if (Array.isArray(productsList) && productsList.length > 0) {
           setProducts(productsList);
-          if (productsList.length > 0 && transactionData.productId === '') {
-            const defaultProduct = productsList[0];
-            const defaultTotalAmount = defaultProduct.price * transactionData.quantity;
-            setTransactionData((prevData) => ({
-              ...prevData,
-              productId: defaultProduct.id,
-              totalAmount: defaultTotalAmount,
-            }));
-          }
+          const defaultProduct = productsList[0];
+          setTransactionData((prevData) => ({
+            ...prevData,
+            productIds: [defaultProduct.id],
+            totalAmount: defaultProduct.price * prevData.quantity,
+          }));
         } else {
           setError('No products available');
         }
@@ -77,32 +67,32 @@ const Transaction = () => {
     };
 
     fetchProducts();
-  }, [transactionData.quantity, transactionData.productId]); // Added productId to dependency array
+  }, []);
 
   useEffect(() => {
-    const product = products.find((p) => p.id === parseInt(transactionData.productId));
+    const product = products.find((p) => p.id === parseInt(transactionData.productIds[0]));
     if (product) {
       const totalAmount = product.price * transactionData.quantity;
       setTransactionData((prevData) => ({
         ...prevData,
-        totalAmount: totalAmount,
+        totalAmount,
       }));
     }
-  }, [transactionData.quantity, transactionData.productId, products]);
+  }, [transactionData.quantity, transactionData.productIds, products]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
-      await createTransaction(transactionData);
+      await createTransaction(transactionData.userId, transactionData.productIds, transactionData.totalAmount);
       setShowSuccessModal(true);
       setTransactionData({
         userId: '',
-        productId: '',
+        productIds: [],
         quantity: 1,
         totalAmount: 0,
       });
     } catch (error) {
+      console.error('Error creating transaction:', error);
       setError('Failed to create transaction');
     }
   };
@@ -116,14 +106,17 @@ const Transaction = () => {
       {loading ? (
         <div>Loading...</div>
       ) : (
-        <Form onSubmit={handleSubmit} disabled={isFormDisabled}>
+        <Form onSubmit={handleSubmit}>
           <Form.Group controlId="productId" className="mb-3">
             <Form.Label>Select Product</Form.Label>
             <Form.Control
               as="select"
-              value={transactionData.productId}
+              value={transactionData.productIds[0] || ''}
               onChange={(e) =>
-                setTransactionData({ ...transactionData, productId: e.target.value })
+                setTransactionData({
+                  ...transactionData,
+                  productIds: [e.target.value],
+                })
               }
               disabled={isFormDisabled}
             >
@@ -142,7 +135,10 @@ const Transaction = () => {
               min="1"
               value={transactionData.quantity}
               onChange={(e) =>
-                setTransactionData({ ...transactionData, quantity: parseInt(e.target.value) })
+                setTransactionData({
+                  ...transactionData,
+                  quantity: parseInt(e.target.value),
+                })
               }
               disabled={isFormDisabled}
             />
@@ -150,11 +146,7 @@ const Transaction = () => {
 
           <Form.Group controlId="totalAmount" className="mb-3">
             <Form.Label>Total Amount</Form.Label>
-            <Form.Control
-              type="text"
-              value={`Rp. ${transactionData.totalAmount}`}
-              readOnly
-            />
+            <Form.Control type="text" value={`Rp. ${transactionData.totalAmount}`} readOnly />
           </Form.Group>
 
           <Button variant="primary" type="submit" disabled={isFormDisabled} className="w-100">
@@ -171,7 +163,9 @@ const Transaction = () => {
           <Alert variant="success">Your transaction has been successfully created!</Alert>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseSuccessModal}>Close</Button>
+          <Button variant="secondary" onClick={handleCloseSuccessModal}>
+            Close
+          </Button>
         </Modal.Footer>
       </Modal>
     </Container>
