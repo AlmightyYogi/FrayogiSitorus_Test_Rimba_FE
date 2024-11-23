@@ -1,6 +1,6 @@
 import React, { useState, useContext } from "react";
 import { Button, Form, Container, Card } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { login } from "../services/api";
 import { AuthContext } from "../context/AuthContext";
 
