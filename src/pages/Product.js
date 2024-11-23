@@ -7,12 +7,25 @@ const Product = () => {
   const [newProduct, setNewProduct] = useState({ name: '', description: '', price: '' });
   const [isFormDisabled, setIsFormDisabled] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [showSuccessModal, setShowSuccessModal] = useState(false); // Success modal state
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [userId, setUserId] = useState(null); // State to hold userId
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
       setIsFormDisabled(true);
+    } else {
+      try {
+        const decodedToken = JSON.parse(atob(token.split('.')[1]));
+        if (decodedToken && decodedToken.id) {
+          setUserId(decodedToken.id); // Set userId in state
+        } else {
+          setIsFormDisabled(true); // If no userId in token, disable form
+        }
+      } catch (error) {
+        console.error('Error decoding token', error);
+        setIsFormDisabled(true); // If decoding fails, disable form
+      }
     }
 
     const fetchProducts = async () => {
@@ -46,7 +59,7 @@ const Product = () => {
       <h2 className="text-center mb-4 text-primary" style={{ marginTop: '70px' }}>Products</h2>
       
       <div className="text-center mb-4">
-        <Button variant="primary" onClick={handleShowModal}>
+        <Button variant="primary" onClick={handleShowModal} disabled={isFormDisabled}>
           Add New Product
         </Button>
       </div>
@@ -68,7 +81,6 @@ const Product = () => {
         ))}
       </Row>
 
-      {/* Success Modal */}
       <Modal show={showSuccessModal} onHide={handleCloseSuccessModal}>
         <Modal.Header closeButton>
           <Modal.Title>Success</Modal.Title>

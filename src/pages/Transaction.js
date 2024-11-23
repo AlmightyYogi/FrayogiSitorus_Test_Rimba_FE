@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Form, Container, Row, Col, Alert, Modal } from 'react-bootstrap';
+import { Button, Form, Container, Row, Col, Card, Alert, Modal } from 'react-bootstrap';
 import { createTransaction, getProducts } from '../services/api';
 
 const getUserIdFromToken = () => {
@@ -27,7 +27,7 @@ const Transaction = () => {
   });
 
   const [products, setProducts] = useState([]);
-  // const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [isFormDisabled, setIsFormDisabled] = useState(true);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -129,63 +129,87 @@ const Transaction = () => {
       <h2 className="text-center mb-4 text-primary" style={{ marginTop: '70px' }}>Create Transaction</h2>
       {error && <Alert variant="danger">{error}</Alert>}
       <Row className="justify-content-center">
-        <Col md={8}>
-          <Form onSubmit={handleSubmit}>
-            <Form.Group controlId="productId" className="mb-3">
-              <Form.Label>Product</Form.Label>
-              <Form.Control
-                as="select"
-                name="productId"
-                value={transactionData.productId}
-                onChange={handleChange}
-                disabled={isFormDisabled}
-              >
-                {products.map((product) => (
-                  <option key={product.id} value={product.id}>
-                    {product.name} - Rp. {product.price}
-                  </option>
-                ))}
-              </Form.Control>
-            </Form.Group>
+        <Col md={8} lg={6}>
+          <Card className="shadow-lg rounded-3">
+            <Card.Body>
+              <Form onSubmit={handleSubmit}>
+                <Form.Group controlId="productId" className="mb-3">
+                  <Form.Label>Product</Form.Label>
+                  <Form.Control
+                    as="select"
+                    name="productId"
+                    value={transactionData.productId}
+                    onChange={handleChange}
+                    disabled={isFormDisabled || loading}
+                    required
+                  >
+                    <option value="">Select a product</option>
+                    {loading ? (
+                      <option disabled>Loading products...</option>
+                    ) : products.length > 0 ? (
+                      products.map((product) => (
+                        <option key={product.id} value={product.id}>
+                          {product.name} - Rp.{product.price}
+                        </option>
+                      ))
+                    ) : (
+                      <option disabled>No products available</option>
+                    )}
+                  </Form.Control>
+                </Form.Group>
 
-            <Form.Group controlId="quantity" className="mb-3">
-              <Form.Label>Quantity</Form.Label>
-              <Form.Control
-                type="number"
-                name="quantity"
-                value={transactionData.quantity}
-                onChange={handleQuantityChange}
-                min="1"
-                disabled={isFormDisabled}
-              />
-            </Form.Group>
+                <Form.Group controlId="quantity" className="mb-3">
+                  <Form.Label>Quantity</Form.Label>
+                  <Form.Control
+                    type="number"
+                    name="quantity"
+                    value={transactionData.quantity}
+                    onChange={handleQuantityChange}
+                    disabled={isFormDisabled}
+                    required
+                    min="1"
+                  />
+                </Form.Group>
 
-            <Form.Group controlId="totalAmount" className="mb-3">
-              <Form.Label>Total Amount</Form.Label>
-              <Form.Control
-                type="text"
-                name="totalAmount"
-                value={transactionData.totalAmount}
-                readOnly
-              />
-            </Form.Group>
+                <Form.Group controlId="totalAmount" className="mb-3">
+                  <Form.Label>Total Amount</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="totalAmount"
+                    value={transactionData.totalAmount}
+                    readOnly
+                  />
+                </Form.Group>
 
-            <Button variant="primary" type="submit" disabled={isFormDisabled} className="w-100">
-              Submit Transaction
-            </Button>
-          </Form>
+                <div className="d-grid gap-2">
+                  <Button
+                    variant="primary"
+                    type="submit"
+                    disabled={isFormDisabled || loading}
+                    size="lg"
+                  >
+                    Create Transaction
+                  </Button>
+                </div>
+              </Form>
+            </Card.Body>
+          </Card>
         </Col>
       </Row>
 
       <Modal show={showSuccessModal} onHide={handleCloseSuccessModal}>
         <Modal.Header closeButton>
-          <Modal.Title>Transaction Successful</Modal.Title>
+          <Modal.Title>Success</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Alert variant="success">Your transaction was successfully created!</Alert>
+          <Alert variant="success">
+            Transaction created successfully!
+          </Alert>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseSuccessModal}>Close</Button>
+          <Button variant="secondary" onClick={handleCloseSuccessModal}>
+            Close
+          </Button>
         </Modal.Footer>
       </Modal>
     </Container>
