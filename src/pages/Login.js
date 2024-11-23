@@ -1,12 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Button, Form, Container, Card } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { login } from "../services/api";
-import { Link } from 'react-router-dom';
+import { AuthContext } from "../context/AuthContext";
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [error, setError] = useState(null);
+  const { login: setAuth } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -14,26 +15,15 @@ const Login = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleLogin = async (email, password) => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     try {
-      const response = await login(email, password);
-      // Check if response contains a token (assuming this is returned upon success)
-      if (response && response.token) {
-        localStorage.setItem('token', response.token);
-        navigate('/dashboard');
-      } else {
-        setError('Login failed: No token received');
-      }
+      const response = await login(formData.email, formData.password);
+      setAuth(response.token);
+      navigate('/dashboard');
     } catch (error) {
-      // Log the full error response for debugging
-      console.error('Login Error:', error.response || error);
       setError('Invalid credentials. Please try again.');
     }
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    handleLogin(formData.email, formData.password);
   };
 
   return (
@@ -68,9 +58,6 @@ const Login = () => {
           </Form.Group>
           <Button variant="primary" type="submit" className="w-100">Login</Button>
         </Form>
-        <div className="text-center mt-3">
-          <p>Don't have an account yet? <Link to="/register">Register now</Link></p>
-        </div>
       </Card>
     </Container>
   );

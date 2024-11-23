@@ -29,6 +29,33 @@ const Transaction = () => {
   const [isFormDisabled, setIsFormDisabled] = useState(true);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      const productsResponse = await getProducts();
+      const productsList = Array.isArray(productsResponse)
+        ? productsResponse
+        : productsResponse.products;
+
+      if (Array.isArray(productsList) && productsList.length > 0) {
+        setProducts(productsList);
+        const defaultProduct = productsList[0];
+        setTransactionData((prevData) => ({
+          ...prevData,
+          productIds: [defaultProduct.id],
+          totalAmount: defaultProduct.price * prevData.quantity,
+        }));
+      } else {
+        setError('No products available');
+      }
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      setError('Failed to load products');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     const userId = getUserIdFromToken();
     if (!userId) {
@@ -38,33 +65,6 @@ const Transaction = () => {
     }
     setTransactionData((prevData) => ({ ...prevData, userId }));
     setIsFormDisabled(false);
-
-    const fetchProducts = async () => {
-      try {
-        setLoading(true);
-        const productsResponse = await getProducts();
-        const productsList = Array.isArray(productsResponse)
-          ? productsResponse
-          : productsResponse.products;
-
-        if (Array.isArray(productsList) && productsList.length > 0) {
-          setProducts(productsList);
-          const defaultProduct = productsList[0];
-          setTransactionData((prevData) => ({
-            ...prevData,
-            productIds: [defaultProduct.id],
-            totalAmount: defaultProduct.price * prevData.quantity,
-          }));
-        } else {
-          setError('No products available');
-        }
-      } catch (error) {
-        console.error('Error fetching products:', error);
-        setError('Failed to load products');
-      } finally {
-        setLoading(false);
-      }
-    };
 
     fetchProducts();
   }, []);
@@ -85,19 +85,25 @@ const Transaction = () => {
     try {
       await createTransaction(transactionData.userId, transactionData.productIds, transactionData.totalAmount);
       setShowSuccessModal(true);
-      setTransactionData({
-        userId: '',
-        productIds: [],
+
+      setTransactionData((prevData) => ({
+        ...prevData,
+        productIds: [products[0]?.id || ''],
         quantity: 1,
-        totalAmount: 0,
-      });
+        totalAmount: products[0]?.price || 0,
+      }));
+
+      fetchProducts();
     } catch (error) {
       console.error('Error creating transaction:', error);
       setError('Failed to create transaction');
     }
   };
 
-  const handleCloseSuccessModal = () => setShowSuccessModal(false);
+  const handleCloseSuccessModal = () => {
+    setShowSuccessModal(false);
+    setError('');
+  };
 
   return (
     <Container>

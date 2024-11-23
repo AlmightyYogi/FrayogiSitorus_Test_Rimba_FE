@@ -1,17 +1,22 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Navbar, Nav, Container } from 'react-bootstrap';
 import { Link, useLocation } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext';
 
 const NavBar = () => {
-  const location = useLocation(); // Dapatkan path URL saat ini
+  const location = useLocation();
+  const { isAuthenticated, logout } = useContext(AuthContext);
 
-  // Daftar halaman tanpa navbar
   const noNavbarPaths = ['/login', '/register'];
 
-  // Periksa apakah path saat ini termasuk dalam daftar
   if (noNavbarPaths.includes(location.pathname)) {
-    return null; // Jangan render Navbar jika path cocok
+    return null;
   }
+
+  const handleLogout = () => {
+    logout();
+    window.location.href = '/login';
+  };
 
   return (
     <Navbar bg="dark" variant="dark" expand="lg" fixed="top">
@@ -20,9 +25,19 @@ const NavBar = () => {
         <Navbar.Toggle aria-controls="navbar-nav" />
         <Navbar.Collapse id="navbar-nav">
           <Nav className="ml-auto">
-            <Nav.Link as={Link} to="/dashboard">Dashboard</Nav.Link>
-            <Nav.Link as={Link} to="/products">Products</Nav.Link>
-            <Nav.Link as={Link} to="/transactions">Transactions</Nav.Link>
+            {isAuthenticated ? (
+              <>
+                <Nav.Link as={Link} to="/dashboard">Dashboard</Nav.Link>
+                <Nav.Link as={Link} to="/products">Products</Nav.Link>
+                <Nav.Link as={Link} to="/transactions">Transactions</Nav.Link>
+                <Nav.Link onClick={handleLogout}>Logout</Nav.Link>
+              </>
+            ) : (
+              <>
+                <Nav.Link as={Link} to="/login">Login</Nav.Link>
+                <Nav.Link as={Link} to="/register">Register</Nav.Link>
+              </>
+            )}
           </Nav>
         </Navbar.Collapse>
       </Container>
