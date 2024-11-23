@@ -17,9 +17,16 @@ const Login = () => {
   const handleLogin = async (email, password) => {
     try {
       const response = await login(email, password);
-      localStorage.setItem('token', response.token);
-      navigate('/dashboard');
+      // Check if response contains a token (assuming this is returned upon success)
+      if (response && response.token) {
+        localStorage.setItem('token', response.token);
+        navigate('/dashboard');
+      } else {
+        setError('Login failed: No token received');
+      }
     } catch (error) {
+      // Log the full error response for debugging
+      console.error('Login Error:', error.response || error);
       setError('Invalid credentials. Please try again.');
     }
   };
