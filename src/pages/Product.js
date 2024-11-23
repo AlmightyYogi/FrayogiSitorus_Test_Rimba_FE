@@ -7,12 +7,15 @@ const Product = () => {
   const [newProduct, setNewProduct] = useState({ name: '', description: '', price: '' });
   const [isFormDisabled, setIsFormDisabled] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [showSuccessModal, setShowSuccessModal] = useState(false); 
+  const [showSuccessModal, setShowSuccessModal] = useState(false); // Success modal state
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
       setIsFormDisabled(true);
+    } else {
+      const decodedToken = JSON.parse(atob(token.split('.')[1]));
+      const userId = decodedToken.id;
     }
 
     const fetchProducts = async () => {
