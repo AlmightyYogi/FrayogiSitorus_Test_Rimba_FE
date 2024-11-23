@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Form, Container, Row, Col, Card, Alert, Modal } from 'react-bootstrap';
+import { Button, Form, Container, Row, Col, Alert, Modal } from 'react-bootstrap';
 import { createTransaction, getProducts } from '../services/api';
 
 const getUserIdFromToken = () => {
@@ -79,7 +79,6 @@ const Transaction = () => {
     fetchProducts();
   }, [transactionData.quantity]);
 
-  // Fix for missing dependency on productId
   useEffect(() => {
     const product = products.find((p) => p.id === parseInt(transactionData.productId));
     if (product) {
@@ -89,7 +88,7 @@ const Transaction = () => {
         totalAmount,
       }));
     }
-  }, [transactionData.productId, transactionData.quantity, products]); // Add productId as a dependency
+  }, [transactionData.productId, transactionData.quantity, products]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

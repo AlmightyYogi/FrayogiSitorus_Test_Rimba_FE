@@ -13,9 +13,6 @@ const Product = () => {
     const token = localStorage.getItem('token');
     if (!token) {
       setIsFormDisabled(true);
-    } else {
-      const decodedToken = JSON.parse(atob(token.split('.')[1]));
-      // const userId = decodedToken.id; // REMOVE this line, as it's not used
     }
 
     const fetchProducts = async () => {
