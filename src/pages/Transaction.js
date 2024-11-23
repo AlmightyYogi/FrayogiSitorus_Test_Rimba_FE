@@ -17,13 +17,14 @@ const Transaction = () => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   useEffect(() => {
-    const userId = getUserIdFromToken();
-    if (!userId) {
+    const token = localStorage.getItem('token');
+    if (!token) {
       setIsFormDisabled(true);
     } else {
+      const decodedToken = JSON.parse(atob(token.split('.')[1])); // Mendekode token untuk mendapatkan userId
       setTransactionData((prevData) => ({
         ...prevData,
-        userId: userId,
+        userId: decodedToken.userId,
       }));
       setIsFormDisabled(false);
     }
