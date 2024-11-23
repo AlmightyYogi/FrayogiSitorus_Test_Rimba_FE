@@ -8,7 +8,6 @@ const Product = () => {
   const [isFormDisabled, setIsFormDisabled] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [userId, setUserId] = useState(null); // State to hold userId
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -17,14 +16,12 @@ const Product = () => {
     } else {
       try {
         const decodedToken = JSON.parse(atob(token.split('.')[1]));
-        if (decodedToken && decodedToken.id) {
-          setUserId(decodedToken.id); // Set userId in state
-        } else {
-          setIsFormDisabled(true); // If no userId in token, disable form
+        if (!decodedToken || !decodedToken.id) {
+          setIsFormDisabled(true);
         }
       } catch (error) {
         console.error('Error decoding token', error);
-        setIsFormDisabled(true); // If decoding fails, disable form
+        setIsFormDisabled(true);
       }
     }
 
