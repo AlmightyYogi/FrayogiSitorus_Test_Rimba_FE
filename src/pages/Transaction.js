@@ -27,7 +27,7 @@ const Transaction = () => {
   });
 
   const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  // const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [isFormDisabled, setIsFormDisabled] = useState(true);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
