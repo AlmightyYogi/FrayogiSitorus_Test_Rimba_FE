@@ -15,9 +15,18 @@ const getUserIdFromToken = () => {
   return null;
 };
 
+// Helper function to format currency
+const formatCurrency = (amount) => {
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+  }).format(amount);
+};
+
 const Transaction = () => {
   const [transactionData, setTransactionData] = useState({
     userId: '',
+    customer: '',  // Add customer field
     productIds: [],
     quantity: 1,
     totalAmount: 0,
@@ -33,9 +42,9 @@ const Transaction = () => {
     try {
       setLoading(true);
       const productsResponse = await getProducts();
-      const productsList = Array.isArray(productsResponse)
-        ? productsResponse
-        : productsResponse.products;
+      // console.log('Fetched products:', productsResponse);
+
+      const productsList = productsResponse.data || [];
 
       if (Array.isArray(productsList) && productsList.length > 0) {
         setProducts(productsList);
@@ -70,9 +79,9 @@ const Transaction = () => {
   }, []);
 
   useEffect(() => {
-    const product = products.find((p) => p.id === parseInt(transactionData.productIds[0]));
-    if (product) {
-      const totalAmount = product.price * transactionData.quantity;
+    const selectedProduct = products.find((p) => p.id === parseInt(transactionData.productIds[0]));
+    if (selectedProduct) {
+      const totalAmount = selectedProduct.price * transactionData.quantity;
       setTransactionData((prevData) => ({
         ...prevData,
         totalAmount,
@@ -82,8 +91,24 @@ const Transaction = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Prepare the products array for the request body
+    const selectedProduct = products.find((p) => p.id === parseInt(transactionData.productIds[0]));
+    const productsToSend = [
+      {
+        productCode: selectedProduct?.productCode || '',
+        quantity: transactionData.quantity,
+      },
+    ];
+
+    // Prepare the request body based on the expected API format
+    const requestBody = {
+      customer: transactionData.customer,  // Include the customer name
+      product: productsToSend,  // Send the products in the correct format
+    };
+
     try {
-      await createTransaction(transactionData.userId, transactionData.productIds, transactionData.totalAmount);
+      await createTransaction(transactionData.userId, requestBody);
       setShowSuccessModal(true);
 
       setTransactionData((prevData) => ({
@@ -113,6 +138,22 @@ const Transaction = () => {
         <div>Loading...</div>
       ) : (
         <Form onSubmit={handleSubmit}>
+          <Form.Group controlId="customer" className="mb-3">
+            <Form.Label>Customer Name</Form.Label>
+            <Form.Control
+              type="text"
+              value={transactionData.customer}
+              onChange={(e) =>
+                setTransactionData({
+                  ...transactionData,
+                  customer: e.target.value,
+                })
+              }
+              disabled={isFormDisabled}
+              placeholder="Enter customer name"
+            />
+          </Form.Group>
+
           <Form.Group controlId="productId" className="mb-3">
             <Form.Label>Select Product</Form.Label>
             <Form.Control
@@ -126,9 +167,10 @@ const Transaction = () => {
               }
               disabled={isFormDisabled}
             >
+              <option value="" disabled>Select a product</option>
               {products.map((product) => (
                 <option key={product.id} value={product.id}>
-                  {product.name} - Rp.{product.price}
+                  {product.name} ({product.productCode}) - {formatCurrency(product.price)}
                 </option>
               ))}
             </Form.Control>
@@ -152,7 +194,7 @@ const Transaction = () => {
 
           <Form.Group controlId="totalAmount" className="mb-3">
             <Form.Label>Total Amount</Form.Label>
-            <Form.Control type="text" value={`Rp. ${transactionData.totalAmount}`} readOnly />
+            <Form.Control type="text" value={formatCurrency(transactionData.totalAmount)} readOnly />
           </Form.Group>
 
           <Button variant="primary" type="submit" disabled={isFormDisabled} className="w-100">
