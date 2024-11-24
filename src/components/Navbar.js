@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, useMemo } from 'react';
 import { Navbar, Nav, Container } from 'react-bootstrap';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
@@ -10,11 +10,12 @@ const NavBar = () => {
 
   const [showNavbar, setShowNavbar] = useState(true);
 
-  const noNavbarPaths = ['/login', '/register'];
+  // Menyimpan paths yang tidak memerlukan navbar dalam useMemo untuk menghindari perubahan setiap render
+  const noNavbarPaths = useMemo(() => ['/login', '/register'], []);  
 
   useEffect(() => {
     setShowNavbar(!noNavbarPaths.includes(location.pathname));
-  }, [location, noNavbarPaths]);
+  }, [location, noNavbarPaths]);  // Memastikan useEffect hanya berjalan jika 'location' atau 'noNavbarPaths' berubah
 
   if (!showNavbar) {
     return null;
