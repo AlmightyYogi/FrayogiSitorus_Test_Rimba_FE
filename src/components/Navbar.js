@@ -14,7 +14,7 @@ const NavBar = () => {
 
   useEffect(() => {
     setShowNavbar(!noNavbarPaths.includes(location.pathname));
-  }, [location]);
+  }, [location, noNavbarPaths]);
 
   if (!showNavbar) {
     return null;
@@ -22,7 +22,7 @@ const NavBar = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');  // Redirect using navigate instead of window.location.href
+    navigate('/login');
   };
 
   return (
