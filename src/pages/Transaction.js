@@ -92,7 +92,6 @@ const Transaction = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Prepare the products array for the request body
     const selectedProduct = products.find((p) => p.id === parseInt(transactionData.productIds[0]));
     const productsToSend = [
       {
@@ -101,10 +100,9 @@ const Transaction = () => {
       },
     ];
 
-    // Prepare the request body based on the expected API format
     const requestBody = {
-      customer: transactionData.customer,  // Include the customer name
-      product: productsToSend,  // Send the products in the correct format
+      customer: transactionData.customer,
+      product: productsToSend,
     };
 
     try {
@@ -151,6 +149,7 @@ const Transaction = () => {
               }
               disabled={isFormDisabled}
               placeholder="Enter customer name"
+              required
             />
           </Form.Group>
 

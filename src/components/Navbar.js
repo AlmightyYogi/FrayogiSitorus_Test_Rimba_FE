@@ -10,12 +10,11 @@ const NavBar = () => {
 
   const [showNavbar, setShowNavbar] = useState(true);
 
-  // Menyimpan paths yang tidak memerlukan navbar dalam useMemo untuk menghindari perubahan setiap render
   const noNavbarPaths = useMemo(() => ['/login', '/register'], []);  
 
   useEffect(() => {
     setShowNavbar(!noNavbarPaths.includes(location.pathname));
-  }, [location, noNavbarPaths]);  // Memastikan useEffect hanya berjalan jika 'location' atau 'noNavbarPaths' berubah
+  }, [location, noNavbarPaths]);
 
   if (!showNavbar) {
     return null;
