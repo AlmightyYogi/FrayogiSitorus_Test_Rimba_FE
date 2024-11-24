@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'https://innovative-wholeness-production.up.railway.app/api';
+const API_URL = 'https://frayogisitorustestrimbabe-production.up.railway.app/api';
 // const API_URL = 'http://localhost:4000/api';
 
 const api = axios.create({
