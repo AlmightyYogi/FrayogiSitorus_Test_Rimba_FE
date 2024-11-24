@@ -1,21 +1,28 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Navbar, Nav, Container } from 'react-bootstrap';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 
 const NavBar = () => {
   const location = useLocation();
   const { isAuthenticated, logout } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const [showNavbar, setShowNavbar] = useState(true);
 
   const noNavbarPaths = ['/login', '/register'];
 
-  if (noNavbarPaths.includes(location.pathname)) {
+  useEffect(() => {
+    setShowNavbar(!noNavbarPaths.includes(location.pathname));
+  }, [location]);
+
+  if (!showNavbar) {
     return null;
   }
 
   const handleLogout = () => {
     logout();
-    window.location.href = '/login';
+    navigate('/login');  // Redirect using navigate instead of window.location.href
   };
 
   return (
